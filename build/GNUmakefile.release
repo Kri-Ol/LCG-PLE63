@@ -1,0 +1,7 @@
+# -*- Makefile -*-
+
+# add optimization flags
+
+CXXFLAGS += -Ofast -DNDEBUG -finline-functions -fomit-frame-pointer -ffast-math -fno-math-errno -mfpmath=sse
+CFLAGS   += -Ofast -DNDEBUG -finline-functions -fomit-frame-pointer -ffast-math -fno-math-errno -mfpmath=sse
+LDFLAGS  += -Ofast

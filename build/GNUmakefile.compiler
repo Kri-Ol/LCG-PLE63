@@ -1,0 +1,50 @@
+# -*- Makefile -*-
+#
+# compilers
+#
+
+CC  := gcc
+CXX := c++
+LD  := c++
+
+# generic C++ flags
+CXXFLAGS := -pipe -ansi -Wall -Winline -std=gnu++1y -Wno-unknown-pragmas # -Wextra
+
+# include C++ flags
+CXXFLAGS += -I$(LOCAL_INCLUDE) -I. $(DEFS)
+
+# generic C flags
+CFLAGS := -pipe -Wall -Winline -std=gnu11 -Wno-unknown-pragmas # -Wextra
+
+# include C flags
+CFLAGS += -I$(LOCAL_INCLUDE) -I. $(DEFS)
+
+# to make properly shared objects
+PIC := -fPIC
+
+LDFLAGS := -pipe
+
+SYSLIB   :=
+
+ifeq ($(CONFIG),Release)
+  include build/GNUmakefile.release
+else
+  ifeq ($(CONFIG),opt)
+    include build/GNUmakefile.release
+  else
+    ifeq ($(CONFIG),profile)
+     include build/GNUmakefile.profile
+    else
+      ifeq ($(CONFIG),coverage)
+        include build/GNUmakefile.coverage
+      else
+        ifeq ($(CONFIG),Debug)
+          include build/GNUmakefile.debug
+        else
+          $(error CONFIG=$(CONFIG) is unknown to me)
+        endif
+      endif
+    endif
+  endif
+endif
+

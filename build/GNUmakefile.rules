@@ -1,0 +1,23 @@
+# -*- Makefile -*-
+
+#
+# here we have implicit compilation rules
+#
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+%.o: %.cc
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+%.os: %.c
+	$(CC) $(PIC) $(CFLAGS) -c $< -o $@
+
+%.os: %.cpp
+	$(CXX) $(PIC) $(CXXFLAGS) -c $< -o $@
+
+%.os: %.cc
+	$(CXX) $(PIC) $(CXXFLAGS) -c $< -o $@

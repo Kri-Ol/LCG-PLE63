@@ -1,0 +1,11 @@
+# -*- Makefile -*-
+
+#
+# CPPUNIT
+#
+
+CPPUNIT_INCLUDE := $(shell pkg-config --cflags cppunit)
+CPPUNIT_LIBPATH := $(shell pkg-config --libs-only-L cppunit)
+CPPUNIT_LIBS    := $(shell pkg-config --libs-only-l cppunit)
+
+CXXFLAGS += $(CPPUNIT_INCLUDE)

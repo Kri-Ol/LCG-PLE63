@@ -1,0 +1,7 @@
+# -*- Makefile -*-
+
+# add debugging flags
+
+CXXFLAGS += -g -Og
+CFLAGS   += -g -Og
+LDFLAGS  += -g -Og

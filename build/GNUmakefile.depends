@@ -1,0 +1,27 @@
+# -*- Makefile -*-
+
+# dependencies implicit rules for C++
+%.d: %.cpp
+	@$(ECHO) Makedepend for $<... Create $@
+	@$(CXX) -E -MM -MP -MT '$(patsubst %.d,%.o,$@) $@' $(CXXFLAGS) $< -MF $@
+
+%.d: %.cc
+	@$(ECHO) Makedepend for $<... Create $@
+	@$(CXX) -E -MM -MP -MT '$(patsubst %.d,%.o,$@) $@' $(CXXFLAGS) $< -MF $@
+
+%.g: %.cpp
+	@$(ECHO) Makedepend for $<... Create $@
+	@$(CXX) -E -MM -MP -MT '$(patsubst %.g,%.os,$@) $@' $(CXXFLAGS) $< -MF $@
+
+%.g: %.cc
+	@$(ECHO) Makedepend for $<... Create $@
+	@$(CXX) -E -MM -MP -MT '$(patsubst %.g,%.os,$@) $@' $(CXXFLAGS) $< -MF $@
+
+# dependencies implicit rules for C
+%.d: %.c
+	@$(ECHO) Makedepend for $<... Create $@
+	@$(CC) -E -MM -MP -MT '$(patsubst %.d,%.o,$@) $@' $(CFLAGS) $< -MF $@
+
+%.g: %.c
+	@$(ECHO) Makedepend for $<... Create $@
+	@$(CC) -E -MM -MP -MT '$(patsubst %.g,%.os,$@) $@' $(CFLAGS) $< -MF $@

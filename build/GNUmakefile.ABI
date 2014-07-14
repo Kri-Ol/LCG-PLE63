@@ -1,0 +1,11 @@
+# -*- Makefile -*-
+
+#
+# here are ABI specific compiler/linker switches
+#
+
+COMMON_DEFINES := 
+
+CFLAGS   += -pthread -march=native -mtune=native $(COMMON_DEFINES)
+CXXFLAGS += -pthread -march=native -mtune=native $(COMMON_DEFINES)
+LDFLAGS  += -pthread -march=native -mtune=native
