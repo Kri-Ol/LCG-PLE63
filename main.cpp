@@ -146,6 +146,39 @@ static bool test_skip_backward_and_back(int64_t ns)
     return (rng.seed() == the_seed);
 }
 
+static bool test_custom_vs_std(uint64_t ns)
+{
+    OTI::lcg_PLE63 rng;
+    std::linear_congruential_engine<uint_fast64_t, 2806196910506780709ULL, 1ULL, (1ULL<<63ULL)> rng_std;
+
+    for(uint64_t k = 0; k != ns; ++k)
+    {
+        rng.sample();
+        OTI::lcg_PLE63::seed_type rseed = rng.seed();
+
+        OTI::lcg_PLE63::seed_type sseed = rng_std();
+
+        if (rseed != sseed)
+            return false;
+    }
+
+    return true;
+}
+
+static bool test_skip_custom_vs_std(int64_t ns)
+{
+    OTI::lcg_PLE63 rng;
+    std::linear_congruential_engine<uint_fast64_t, 2806196910506780709ULL, 1ULL, (1ULL<<63ULL)> rng_std;
+
+    rng.skip(ns);
+    OTI::lcg_PLE63::seed_type rseed = rng.seed();
+
+    rng_std.discard(ns);
+    OTI::lcg_PLE63::seed_type sseed = rng_std.the_seed();
+
+    return (rseed == sseed);
+}
+
 int main(int argc, char* argv[])
 {
     OTI::lcg_PLE63::result_type period = find_period(2500000000ULL, std::cout); 
@@ -169,6 +202,15 @@ int main(int argc, char* argv[])
     assert(q);
 
     q = test_skip_backward_and_back(-12391LL);
+    assert(q);
+
+    q = test_custom_vs_std(10ULL);
+    assert(q);
+
+    q = test_skip_custom_vs_std(10ULL);
+    assert(q);
+
+    q = test_skip_custom_vs_std(123987LL);
     assert(q);
 
     return 0;

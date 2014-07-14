@@ -13,9 +13,9 @@ namespace std
         public: typedef uint_fast64_t result_type;
         public: typedef result_type   seed_type;
 
-        public: static constexpr result_type modulus    = M;
         public: static constexpr result_type multiplier = A;
         public: static constexpr result_type increment  = C;
+        public: static constexpr result_type modulus    = M;
 
         public: static constexpr result_type mask = modulus - 1ULL;
 
@@ -77,8 +77,8 @@ namespace std
             // The algorithm here to determine the parameters used to skip ahead is
             // described in the paper F. Brown, "Random Number Generation with Arbitrary Stride,"
             // Trans. Am. Nucl. Soc. (Nov. 1994). This algorithm is able to skip ahead in
-            // O(log2(N)) operations instead of O(N). It computes parameters G
-            // and C which can then be used to find x_N = G*x_0 + C mod 2^M.
+            // O(log2(N)) operations instead of O(N). It computes parameters
+            // M and C which can then be used to find x_N = M*x_0 + C mod 2^M.
 
             // initialize constants
             result_type m = multiplier; // original multiplicative constant

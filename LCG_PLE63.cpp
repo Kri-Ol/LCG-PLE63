@@ -24,31 +24,31 @@ namespace OTI
         // The algorithm here to determine the parameters used to skip ahead is
         // described in the paper F. Brown, "Random Number Generation with Arbitrary Stride,"
         // Trans. Am. Nucl. Soc. (Nov. 1994). This algorithm is able to skip ahead in
-        // O(log2(N)) operations instead of O(N). It computes parameters G
-        // and C which can then be used to find x_N = G*x_0 + C mod 2^M.
+        // O(log2(N)) operations instead of O(N). It computes parameters
+        // M and C which can then be used to find x_N = M*x_0 + C mod 2^M.
 
         // initialize constants
-        result_type g{ mult }; // original multiplicative constant
+        result_type m{ mult }; // original multiplicative constant
         result_type c{ add };  // original additive constant
 
-        result_type g_next{ 1ULL }; // new effective multiplicative constant
+        result_type m_next{ 1ULL }; // new effective multiplicative constant
         result_type c_next{ 0ULL }; // new effective additive constant
 
         while (nskip > 0LL)
         {
             if (nskip & 1LL) // check least significant bit for being 1
             {
-                g_next = (g_next * g) & mask;
-                c_next = (c_next * g + c) & mask;
+                m_next = (m_next * m) & mask;
+                c_next = (c_next * m + c) & mask;
             }
 
-            c = ((g + 1ULL) * c) & mask;
-            g = (g * g) & mask;
+            c = ((m + 1ULL) * c) & mask;
+            m = (m * m) & mask;
 
             nskip = nskip >> 1LL; // shift right, dropping least significant bit
         }
 
         // with G and C, we can now find the new seed
-        return (g_next * seed + c_next) & mask;
+        return (m_next * seed + c_next) & mask;
     }
 }
