@@ -20,6 +20,8 @@ namespace std
         public: static constexpr result_type mask = modulus - 1ULL;
 
         public: static constexpr seed_type default_seed = 1ULL;
+#pragma endregion
+
 #pragma region Data
         private: seed_type _seed;
 #pragma endregion
