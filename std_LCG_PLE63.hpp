@@ -124,15 +124,15 @@ namespace std
 		const linear_congruential_engine<uint_fast64_t, A, C, M>& left,
 		const linear_congruential_engine<uint_fast64_t, A, C, M>& rght)
 	{
-	    return (left.the_seed() == rght.the_seed());
-	}
+        return (left.the_seed() == rght.the_seed());
+    }
 
     template <uint_fast64_t, uint_fast64_t A, uint_fast64_t C, uint_fast64_t M> bool operator!=(
 		const linear_congruential_engine<uint_fast64_t, A, C, M>& left,
 		const linear_congruential_engine<uint_fast64_t, A, C, M>& rght)
 	{
-	    return (left.the_seed() != rght.the_seed());
-	}
+        return (left.the_seed() != rght.the_seed());
+    }
 
     template<typename CharT, typename Traits,
              uint_fast64_t,
@@ -142,8 +142,8 @@ namespace std
         uint_fast64_t seed;
         is >> seed;
         eng.seed(seed);
-	    return is;
-	}
+        return is;
+    }
 
     template<typename CharT, typename Traits,
              uint_fast64_t,
@@ -151,6 +151,6 @@ namespace std
 	basic_ostream<CharT, Traits>& operator<<( basic_ostream<CharT, Traits>& os, const linear_congruential_engine<uint_fast64_t, A, C, M>& eng)
     {
         os << eng.the_seed();
-	    return os;
-	}
+        return os;
+    }
 }
