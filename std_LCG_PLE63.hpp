@@ -123,14 +123,14 @@ namespace std
     template <uint_fast64_t, uint_fast64_t A, uint_fast64_t C, uint_fast64_t M> bool operator==(
 		const linear_congruential_engine<uint_fast64_t, A, C, M>& left,
 		const linear_congruential_engine<uint_fast64_t, A, C, M>& rght)
-	{
+    {
         return (left.the_seed() == rght.the_seed());
     }
 
     template <uint_fast64_t, uint_fast64_t A, uint_fast64_t C, uint_fast64_t M> bool operator!=(
 		const linear_congruential_engine<uint_fast64_t, A, C, M>& left,
 		const linear_congruential_engine<uint_fast64_t, A, C, M>& rght)
-	{
+    {
         return (left.the_seed() != rght.the_seed());
     }
 
