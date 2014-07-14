@@ -7,6 +7,7 @@
 #include <iostream>
 
 #include "LCG_PLE63.hpp"
+#include "std_LCG_PLE63.hpp"
 
 static uint64_t find_period(uint64_t N, std::ostream& os)
 {
@@ -39,7 +40,7 @@ static inline std::pair<float,float> kahan_summation(std::pair<float,float> s, f
     float y = r - s.second;
     float t = s.first + y;
 
-    return std::make_pair(t, (t - s.first) - y);
+    return std::pair<float,float>{t, (t - s.first) - y};
 }
 
 static std::pair<float,float> test_mean_sigma(uint64_t n)
@@ -55,14 +56,6 @@ static std::pair<float,float> test_mean_sigma(uint64_t n)
 
         s = kahan_summation(s, r);
         d = kahan_summation(d, r*r);
-        /*        
-        {
-            float y = r*r - d.second;
-            float t = d.first + y;
-            d.second = (t - d.first) - y;
-            d.first  = t;
-        }
-        */
     }
 
     s.first /= float(n);
@@ -73,7 +66,7 @@ static std::pair<float,float> test_mean_sigma(uint64_t n)
     if (d.first < 0.0f)
         d.first = 0.0f;
 
-    return std::make_pair(s.first, d.first);
+    return std::pair<float,float>{s.first, d.first};
 }
 
 static bool test_skip_ahead(int64_t ns)
