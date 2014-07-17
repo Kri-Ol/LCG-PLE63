@@ -207,10 +207,10 @@ int main(int argc, char* argv[])
     q = test_custom_vs_std(10ULL);
     assert(q);
 
-    q = test_skip_custom_vs_std(10ULL);
+    q = test_skip_custom_vs_std(1336789ULL);
     assert(q);
 
-    q = test_skip_custom_vs_std(123987LL);
+    q = test_skip_custom_vs_std(-123987LL);
     assert(q);
 
     return 0;
