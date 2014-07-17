@@ -21,7 +21,7 @@ namespace OTI
         public: static constexpr result_type  mult  = 2806196910506780709ULL;
         public: static constexpr result_type  add   = 1ULL;
 
-        public: static constexpr result_type  default_seed   = 1ULL;        
+        public: static constexpr seed_type  default_seed   = 1ULL;        
 
         public: static constexpr float        norm  = float{1.0842021724855044340074528008699e-19};
 #pragma endregion
@@ -31,7 +31,7 @@ namespace OTI
 #pragma endregion
 
 #pragma region Ctor/Dtor/op=
-        public: lcg_PLE63(result_type seed = default_seed):
+        public: lcg_PLE63(seed_type seed = default_seed):
             _seed{seed}
         {
         }
@@ -52,7 +52,7 @@ namespace OTI
             return *this;
         }
 
-        public: lcg_PLE63& operator=(lcg_PLE63& r)
+        public: lcg_PLE63& operator=(lcg_PLE63&& r)
         {
             _seed = std::move(r._seed);
             return *this;
