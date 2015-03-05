@@ -8,7 +8,7 @@ CXX := c++
 LD  := c++
 
 # generic C++ flags
-CXXFLAGS := -pipe -ansi -Wall -Winline -std=gnu++1y -Wno-unknown-pragmas # -Wextra
+CXXFLAGS := -pipe -ansi -Wall -Winline -std=gnu++14 -Wno-unknown-pragmas # -Wextra
 
 # include C++ flags
 CXXFLAGS += -I$(LOCAL_INCLUDE) -I. $(DEFS)
