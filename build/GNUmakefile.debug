@@ -2,6 +2,6 @@
 
 # add debugging flags
 
-CXXFLAGS += -g -Og
-CFLAGS   += -g -Og
-LDFLAGS  += -g -Og
+CXXFLAGS += -ggdb3 -gdwarf-4 -fvar-tracking-assignments -Og
+CFLAGS   += -ggdb3 -gdwarf-4 -fvar-tracking-assignments -Og
+LDFLAGS  += -ggdb3 -gdwarf-4 -fvar-tracking-assignments -Og

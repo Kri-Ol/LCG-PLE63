@@ -4,44 +4,39 @@
 
 #include <cstdint>
 #include <random>
+#include <iostream>
 
 namespace std
 {
-    template <uint_fast64_t A, uint_fast64_t C, uint_fast64_t M> class linear_congruential_engine<uint_fast64_t, A, C, M>
+    template <uint64_t A, uint64_t C, uint64_t M> class linear_congruential_engine<uint64_t, A, C, M>
     {
 #pragma region Typedefs/Constants
-        public: typedef uint_fast64_t result_type;
-        public: typedef result_type   seed_type;
+        public: using result_type = uint64_t;
 
-        public: static constexpr result_type multiplier = A;
-        public: static constexpr result_type increment  = C;
-        public: static constexpr result_type modulus    = M;
+        public: static constexpr result_type multiplier   = A;
+        public: static constexpr result_type increment    = C;
+        public: static constexpr result_type modulus      = M;
 
-        public: static constexpr result_type mask = modulus - 1ULL;
+        public: static constexpr result_type mask         = M - 1ULL;
 
-        public: static constexpr seed_type default_seed = 1ULL;
+        public: static constexpr result_type default_seed = 1ULL;
 #pragma endregion
 
 #pragma region Data
-        private: seed_type _seed;
+        private: result_type _seed;
 #pragma endregion
 
 #pragma region Ctor/Dtor/op=
-        public: explicit linear_congruential_engine(seed_type seed = default_seed):
-            _seed(seed)
+        public: explicit linear_congruential_engine(result_type seed = default_seed):
+            _seed{seed}
         {
         }
+        
+        public: linear_congruential_engine(const linear_congruential_engine& r) = default;
+        public: linear_congruential_engine(linear_congruential_engine&& r)      = default;
 
-        public: linear_congruential_engine(const linear_congruential_engine& r):
-            _seed(r._seed)
-        {
-        }
-
-        public: linear_congruential_engine& operator=(const linear_congruential_engine& r)
-        {
-            _seed = r._seed;
-            return *this;
-        }
+        public: linear_congruential_engine& operator=(const linear_congruential_engine& r) = default;
+        public: linear_congruential_engine& operator=(linear_congruential_engine&& r)      = default;
 
         public: ~linear_congruential_engine()
         {
@@ -49,24 +44,19 @@ namespace std
 #pragma endregion
 
 #pragma region Observers
-        public: void seed(seed_type seed = default_seed)
-        {
-            _seed = seed;
-        }
-
-        public: seed_type the_seed() const
+        public: result_type get_seed() const
         {
             return _seed;
         }
 #pragma endregion
 
 #pragma region Helpers
-        public: static result_type min()
+        public: static constexpr result_type min()
         {
-            return 0ULL;
+            return result_type{C == 0u};
         }
 
-        public: static result_type max()
+        public: static constexpr result_type max()
         {
             return mask;
         }
@@ -109,50 +99,63 @@ namespace std
 #pragma endregion
 
 #pragma region Mutators
-        public: result_type operator()()
+        public: void seed(result_type s = default_seed)
         {
-            _seed = (multiplier * _seed + increment) & mask;
-            return _seed;
+            _seed = s;
         }
 
-        public: void discard(result_type ns)
+        public: result_type operator()()
+        {
+            return (_seed = (multiplier * _seed + increment) & mask);
+        }
+
+        public: void discard(unsigned long long ns)
         {
             _seed = skip(ns, _seed);
         }
 #pragma endregion
     };
 
-    template <uint_fast64_t, uint_fast64_t A, uint_fast64_t C, uint_fast64_t M> bool operator==(
-		const linear_congruential_engine<uint_fast64_t, A, C, M>& left,
-		const linear_congruential_engine<uint_fast64_t, A, C, M>& rght)
+    template <uint64_t, uint64_t A, uint64_t C, uint64_t M> bool operator==(const linear_congruential_engine<uint64_t, A, C, M>& left,
+                          		                                            const linear_congruential_engine<uint64_t, A, C, M>& rght)
     {
-        return (left.the_seed() == rght.the_seed());
+        return (left.get_seed() == rght.get_seed());
     }
 
-    template <uint_fast64_t, uint_fast64_t A, uint_fast64_t C, uint_fast64_t M> bool operator!=(
-		const linear_congruential_engine<uint_fast64_t, A, C, M>& left,
-		const linear_congruential_engine<uint_fast64_t, A, C, M>& rght)
+    template <uint64_t, uint64_t A, uint64_t C, uint64_t M> bool operator!=(const linear_congruential_engine<uint64_t, A, C, M>& left,
+ 		                                                                    const linear_congruential_engine<uint64_t, A, C, M>& rght)
     {
-        return (left.the_seed() != rght.the_seed());
+        return (left.get_seed() != rght.get_seed());
     }
 
-    template<typename CharT, typename Traits,
-             uint_fast64_t,
-             uint_fast64_t A, uint_fast64_t C, uint_fast64_t M>
-	basic_istream<CharT, Traits>& operator>>( basic_istream<CharT, Traits>& is, linear_congruential_engine<uint_fast64_t, A, C, M>& eng)
+    template<typename CharT, typename Traits, uint64_t, uint64_t A, uint64_t C, uint64_t M>
+	basic_istream<CharT, Traits>& operator>>( basic_istream<CharT, Traits>& is, linear_congruential_engine<uint64_t, A, C, M>& eng)
     {
-        uint_fast64_t seed;
+        const auto sflags = is.flags();
+        is.flags(std::basic_istream<CharT, Traits>::ios_base::dec);
+
+        uint64_t seed;
         is >> seed;
         eng.seed(seed);
+        
+        is.flags(sflags);
         return is;
     }
 
-    template<typename CharT, typename Traits,
-             uint_fast64_t,
-             uint_fast64_t A, uint_fast64_t C, uint_fast64_t M>
-	basic_ostream<CharT, Traits>& operator<<( basic_ostream<CharT, Traits>& os, const linear_congruential_engine<uint_fast64_t, A, C, M>& eng)
+    template<typename CharT, typename Traits, uint64_t, uint64_t A, uint64_t C, uint64_t M>
+	std::basic_ostream<CharT, Traits>& operator<<( std::basic_ostream<CharT, Traits>& os, const linear_congruential_engine<uint64_t, A, C, M>& eng)
     {
-        os << eng.the_seed();
+        const auto sflags = os.flags();
+        const auto sfill  = os.fill();
+        
+        os.flags(std::basic_istream<CharT, Traits>::ios_base::dec | std::basic_istream<CharT, Traits>::ios_base::fixed | std::basic_istream<CharT, Traits>::ios_base::left);
+        os.fill(os.widen(' '));
+
+        os << eng.get_seed();
+
+        os.flags(sflags);
+        os.fill(sfill);
         return os;
     }
 }
+

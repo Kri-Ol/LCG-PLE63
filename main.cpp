@@ -1,29 +1,30 @@
 #include <cassert>
 #include <cstdint>
+
 #include <cmath>
+
 #include <algorithm>
 #include <utility>
 
-#include <iostream>
-
 #include "LCG_PLE63.hpp"
 #include "std_LCG_PLE63.hpp"
+#include "uniform_distribution.hpp"
 
 static uint64_t find_period(uint64_t N, std::ostream& os)
 {
     constexpr uint32_t BILLION = 1024U*1024U*1024U;
 
-    OTI::lcg_PLE63 rng;
-    OTI::lcg_PLE63::seed_type the_seed = rng.seed();
+    std::linear_congruential_engine<uint64_t, 2806196910506780709ULL, 1ULL, (1ULL<<63ULL)> ugen;
+    auto seed = ugen.get_seed();
 
     N /= BILLION; // number of billions
 
-    for( uint64_t i = 0; i != N; ++i )
+    for( auto i = 0ULL; i != N; ++i )
     {
-        for( uint32_t k = 0U; k != BILLION; ++k)
+        for( auto k = 0U; k != BILLION; ++k)
         {
-            rng.sample();
-            if (rng.seed() == the_seed)
+            auto s = ugen();
+            if (s == seed)
             {
                 return i*BILLION + uint64_t(k);
             }
@@ -45,15 +46,16 @@ static inline std::pair<float,float> kahan_summation(std::pair<float,float> s, f
 
 static std::pair<float,float> test_mean_sigma(uint64_t n)
 {
-    std::pair<float,float> s{0.0, 0.0};
-    std::pair<float,float> d{0.0, 0.0};
+    std::pair<float,float> s{0.0f, 0.0f};
+    std::pair<float,float> d{0.0f, 0.0f};
 
-    OTI::lcg_PLE63 rng;
+    std::linear_congruential_engine<uint64_t, 2806196910506780709ULL, 1ULL, (1ULL<<63ULL)> ugen;
+    std::uniform_distribution<float> rng;
 
-    for(uint64_t k = 0; k != n; ++k)
+    for(uint64_t k = 0ULL; k != n; ++k)
     {
-        float r = rng.number();
-
+        float r = rng(ugen);
+        
         s = kahan_summation(s, r);
         d = kahan_summation(d, r*r);
     }
@@ -73,90 +75,93 @@ static bool test_skip_ahead(int64_t ns)
 {
     assert( ns > 0LL);
 
-    OTI::lcg_PLE63 rng;
-    OTI::lcg_PLE63 rngs{rng};
+    std::linear_congruential_engine<uint64_t, 2806196910506780709ULL, 1ULL, (1ULL<<63ULL)> ugen;
+    std::linear_congruential_engine<uint64_t, 2806196910506780709ULL, 1ULL, (1ULL<<63ULL)> ugens{ugen};
 
-    rngs.skip(ns);
+    ugens.discard(ns);
 
     // manual skip ahead
+    uint64_t sum{0ULL};
     for(int64_t k = 0; k != ns; ++k)
     {
-        rng.sample();
+        auto r = ugen();
+        sum += r;
     }
 
     // compare manual and fast skip
-    return (rng.seed() == rngs.seed());
+    return (ugen.get_seed() == ugens.get_seed());
 }
 
 static bool test_skip_ahead_and_back(int64_t ns)
 {
     assert( ns > 0LL);
 
-    OTI::lcg_PLE63 rng;
+    std::linear_congruential_engine<uint64_t, 2806196910506780709ULL, 1ULL, (1ULL<<63ULL)> ugen;
+    auto seed = ugen.get_seed();
 
-    OTI::lcg_PLE63::seed_type the_seed = rng.seed();
+    ugen.discard(ns);
+    ugen.discard(-ns);
 
-    rng.skip(ns);
-    rng.skip(-ns);
-
-    return (rng.seed() == the_seed);
+    return (ugen.get_seed() == seed);
 }
 
 static bool test_skip_zero()
 {
-    OTI::lcg_PLE63 rng;
+    std::linear_congruential_engine<uint64_t, 2806196910506780709ULL, 1ULL, (1ULL<<63ULL)> ugen;
 
-    OTI::lcg_PLE63::seed_type the_seed = rng.seed();
+    auto seed = ugen.get_seed();
 
-    rng.skip(0LL);
+    ugen.discard(0LL);
 
-    return (rng.seed() == the_seed);
+    return (ugen.get_seed() == seed);
 }
 
 static bool test_skip_backward(int64_t ns)
 {
     assert( ns < 0LL);
 
-    OTI::lcg_PLE63 rng;
-    OTI::lcg_PLE63::seed_type the_seed = rng.seed();
+    std::linear_congruential_engine<uint64_t, 2806196910506780709ULL, 1ULL, (1ULL<<63ULL)> ugen;
+    auto seed = ugen.get_seed();
 
     // internal skip-ahead
-    rng.skip(ns);
+    ugen.discard(ns);
 
     // manual skip-ahead by same number of steps
-    uint64_t fns = abs(ns);   
-    for(uint64_t k = 0; k != fns; ++k)
+    uint64_t fns = abs(ns);
+    uint64_t sum{0ULL};
+    for(uint64_t k = 0ULL; k != fns; ++k)
     {
-        rng.sample();
+        auto q = ugen();
+        sum += q;
     }
 
-    return (rng.seed() == the_seed);
+    return (ugen.get_seed() == seed);
 }
 
 static bool test_skip_backward_and_back(int64_t ns)
 {
     assert( ns < 0LL);
 
-    OTI::lcg_PLE63 rng;
-    OTI::lcg_PLE63::seed_type the_seed = rng.seed();
+    std::linear_congruential_engine<uint64_t, 2806196910506780709ULL, 1ULL, (1ULL<<63ULL)> ugen;
+    auto seed = ugen.get_seed();
 
-    rng.skip(ns);
-    rng.skip(-ns);
+    ugen.discard(ns);
+    ugen.discard(-ns);
 
-    return (rng.seed() == the_seed);
+    return (ugen.get_seed() == seed);
 }
 
 static bool test_custom_vs_std(uint64_t ns)
 {
     OTI::lcg_PLE63 rng;
-    std::linear_congruential_engine<uint_fast64_t, 2806196910506780709ULL, 1ULL, (1ULL<<63ULL)> rng_std;
+    std::linear_congruential_engine<uint64_t, 2806196910506780709ULL, 1ULL, (1ULL<<63ULL)> rng_std;
 
     for(uint64_t k = 0; k != ns; ++k)
     {
         rng.sample();
-        OTI::lcg_PLE63::seed_type rseed = rng.seed();
+        auto rseed = rng.seed();
 
-        OTI::lcg_PLE63::seed_type sseed = rng_std();
+        auto sseed = rng_std();
 
         if (rseed != sseed)
             return false;
@@ -168,13 +173,13 @@ static bool test_custom_vs_std(uint64_t ns)
 static bool test_skip_custom_vs_std(int64_t ns)
 {
     OTI::lcg_PLE63 rng;
-    std::linear_congruential_engine<uint_fast64_t, 2806196910506780709ULL, 1ULL, (1ULL<<63ULL)> rng_std;
+    std::linear_congruential_engine<uint64_t, 2806196910506780709ULL, 1ULL, (1ULL<<63ULL)> rng_std;
 
     rng.skip(ns);
     OTI::lcg_PLE63::seed_type rseed = rng.seed();
 
     rng_std.discard(ns);
-    OTI::lcg_PLE63::seed_type sseed = rng_std.the_seed();
+    OTI::lcg_PLE63::seed_type sseed = rng_std.get_seed();
 
     return (rseed == sseed);
 }
@@ -215,3 +220,4 @@ int main(int argc, char* argv[])
 
     return 0;
 }
+
